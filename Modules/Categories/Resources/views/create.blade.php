@@ -34,7 +34,7 @@
             </div>
 
             <a href="{{ route('categories.show') }}">
-                <button type="button" class="btn btn-default col-sm-2">
+                <button dusk="back-button" type="button" class="btn btn-default col-sm-2">
                     Back
                 </button>
             </a>
