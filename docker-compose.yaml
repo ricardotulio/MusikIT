@@ -22,3 +22,14 @@ services:
       - MYSQL_DATABASE=musikit
       - MYSQL_USER=musikit
       - MYSQL_PASSWORD=keeprockin
+
+    # PHP (with Nginx)
+  app:
+    image: ambientum/php:7.2-nginx
+    container_name: musikit-server
+    volumes:
+      - .:/var/www/app
+    ports:
+      - "8000:8080"
+    links:
+      - mysql
