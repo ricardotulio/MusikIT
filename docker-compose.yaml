@@ -1,0 +1,24 @@
+# v2 syntax
+version: '2'
+
+# Named volumes
+volumes:
+  # MySQL Data
+  musikit-mysql-data:
+    driver: local
+
+services:
+
+  # MySQL (5.7)
+  mysql:
+    image: mysql:5.7
+    container_name: musikit-mysql
+    volumes:
+      - musikit-mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=keeprockin
+      - MYSQL_DATABASE=musikit
+      - MYSQL_USER=musikit
+      - MYSQL_PASSWORD=keeprockin
