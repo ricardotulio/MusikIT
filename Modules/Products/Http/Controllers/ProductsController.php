@@ -5,6 +5,10 @@ namespace Modules\Products\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
+use Modules\Categories\Entities\Category;
+use Modules\Products\Entities\Products;
+use Modules\Products\Http\Requests\ProductsRequest;
 
 class ProductsController extends Controller
 {
@@ -14,7 +18,10 @@ class ProductsController extends Controller
      */
     public function index()
     {
-        return view('products::index');
+        $user = Auth::user();
+        $products = Products::where('user_id', $user->id)->get();
+
+        return view('products::index', compact('products'));
     }
 
     /**
@@ -23,7 +30,9 @@ class ProductsController extends Controller
      */
     public function create()
     {
-        return view('products::create');
+        $categories = Category::all();
+
+        return view('products::create', compact('categories'));
     }
 
     /**
@@ -31,26 +40,35 @@ class ProductsController extends Controller
      * @param  Request $request
      * @return Response
      */
-    public function store(Request $request)
+    public function store(ProductsRequest $request)
     {
-    }
+        try {
+            $product = new Products();
+            $product->user_id = Auth::id();
+            $product->fill($request->all());
+            $product->save();
 
-    /**
-     * Show the specified resource.
-     * @return Response
-     */
-    public function show()
-    {
-        return view('products::show');
-    }
+            $message = 'Product created successfully';
 
+            return redirect('products')->with('message', $message);
+        } catch (\Exception $exception) {
+            return back()->with('error', $exception->getMessage());
+        }
+    }
     /**
      * Show the form for editing the specified resource.
      * @return Response
      */
-    public function edit()
+    public function edit($id)
     {
-        return view('products::edit');
+        $product = Products::find($id);
+
+        if (Auth::id() !== $product->user_id)
+            return redirect('products')->with('error', 'You don\'t have permition to edit this product! Get the hell out!');
+
+        $categories = Category::all();
+
+        return view('products::edit', compact('product', 'categories'));
     }
 
     /**
@@ -58,15 +76,34 @@ class ProductsController extends Controller
      * @param  Request $request
      * @return Response
      */
-    public function update(Request $request)
+    public function update(ProductsRequest $request)
     {
+        try {
+            $product = Products::find($request->product_id);
+            $product->fill($request->all());
+            $product->save();
+
+            $message = 'Product successfully edited';
+
+            return redirect('products')->with('message', $message);
+        } catch (\Exception $exception) {
+            return back()->with('error', $exception->getMessage());
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      * @return Response
      */
-    public function destroy()
+    public function destroy($id)
     {
+        try {
+            $prodcut = Products::find($id);
+            $prodcut->delete();
+
+            return back()->with('message', 'The products was successfully deleted');
+        } catch (\Exception $exception) {
+            return back()->with('error', $exception->getMessage());
+        }
     }
 }
