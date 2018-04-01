@@ -18,7 +18,7 @@ Route::group(['middleware' => ['web', 'auth'], 'prefix' => 'products', 'namespac
     ]);
 
     Route::get('/edit/{id}', [
-        'uses'      => 'ProductsController@edit',
+        'uses'      => 'Product\StoreProductHandler',
         'as'        => 'products.edit'
     ]);
 
